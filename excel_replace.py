@@ -29,11 +29,11 @@ def main(src_file=None, dst_file=None):
             if s != None and text_old in s: 
                 ws.cell(r,c).value = s.replace(text_old,text_new) 
 
-                print("row {} col {} : {}".format(r,c,s))
+                print(f"row {r} col {c} updated")
                 i += 1
 
     wb.save(dst_file)
-    print("{} cells updated".format(i))
+    print(f"{i} cells updated")
 
 if __name__ == '__main__':
     if len(sys.argv) >= 3:
