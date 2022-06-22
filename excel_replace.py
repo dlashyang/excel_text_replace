@@ -29,7 +29,7 @@ def main(src_file=None, dst_file=None):
     for r in range(1,ws.max_row+1):
         for c in range(1,ws.max_column+1):
             s = ws.cell(r,c).value
-            if s == None: 
+            if ((s == None) or (type(s) != str)): 
                 continue
 
             for replace in replace_set:
