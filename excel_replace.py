@@ -3,8 +3,12 @@ import openpyxl
 import json
 
 def create_cfg_example():
-    cfg = {"source_file" : "sample.xlsx", "target_file" : "target.xlsx", "sheet" : "Sheet2", "mode" : "basic/RE", \
-            "text_original/pattern" : "", "text_new" : ""}
+    cfg = {"source_file" : "sample.xlsx", "target_file" : "target.xlsx", "sheet" : "Sheet2", "mode" : "basic/RE"}
+
+    cfg["replace"] = []
+    cfg["replace"].append({"text_original/pattern" : "", "text_new" : ""})
+    cfg["replace"].append({"text_original/pattern" : "", "text_new" : ""})
+
 
     with open("cfg.json.example", "w+") as f:
         json.dump(cfg, f, indent=4)
@@ -12,28 +16,30 @@ def create_cfg_example():
 def main(src_file=None, dst_file=None):
     with open("cfg.json", "r") as f:
         cfg = json.load(f)
-    (sheet_name, mode, text_old, text_new) = (cfg["sheet"], cfg["mode"], cfg["text_original/pattern"], cfg["text_new"])
-    
+
     if ((src_file == None) or (dst_file == None)):
         (src_file, dst_file) = (cfg["source_file"], cfg["target_file"])
 
+    (sheet_name, mode) = (cfg["sheet"], cfg["mode"])
+    replace_set = cfg["replace"]
 
     wb = openpyxl.load_workbook(src_file)
     ws = wb[sheet_name]
 
-    i = 0
-    #o_string = "3.  Make toolbar icons customizable.\n"
     for r in range(1,ws.max_row+1):
         for c in range(1,ws.max_column+1):
             s = ws.cell(r,c).value
-            if s != None and text_old in s: 
-                ws.cell(r,c).value = s.replace(text_old,text_new) 
+            if s == None: 
+                continue
 
-                print(f"row {r} col {c} updated")
-                i += 1
+            for replace in replace_set:
+                (text_old, text_new) = (replace["text_original/pattern"], replace["text_new"])
+                if text_old in s:
+                    s = s.replace(text_old, text_new) 
+                    ws.cell(r,c).value = s
+                    print(f"row {r} col {c} updated: {text_old} -> {text_new}")
 
     wb.save(dst_file)
-    print(f"{i} cells updated")
 
 if __name__ == '__main__':
     if len(sys.argv) >= 3:
