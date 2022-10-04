@@ -37,7 +37,7 @@ def main(src_file=None, dst_file=None):
     for r in range(1, ws.max_row + 1):
         for c in range(1, ws.max_column + 1):
             s = ws.cell(r, c).value
-            if ((s is None) or (isinstance(s, str))):
+            if ((s is None) or (not isinstance(s, str))):
                 continue
 
             for replace in replace_set:
@@ -47,7 +47,7 @@ def main(src_file=None, dst_file=None):
                     if text_old in s:
                         s = s.replace(text_old, text_new)
                 elif mode == "RE":
-                    s = re.sub(text_old, text_new, s)
+                    s = re.sub(text_old, text_new, s, 0, re.DOTALL)
                 else:
                     print(f"unkonwn mode: {mode}")
                 ws.cell(r, c).value = s
