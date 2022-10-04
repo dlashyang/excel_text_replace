@@ -1,6 +1,7 @@
 import sys
 import openpyxl
 import json
+import re
 
 
 def create_cfg_example():
@@ -42,10 +43,15 @@ def main(src_file=None, dst_file=None):
             for replace in replace_set:
                 (text_old, text_new) = (replace["text_original/pattern"],
                                         replace["text_new"])
-                if text_old in s:
-                    s = s.replace(text_old, text_new)
-                    ws.cell(r, c).value = s
-                    print(f"row {r} col {c} updated: {text_old} -> {text_new}")
+                if mode == "basic":
+                    if text_old in s:
+                        s = s.replace(text_old, text_new)
+                elif mode == "RE":
+                    s = re.sub(text_old, text_new, s)
+                else:
+                    print(f"unkonwn mode: {mode}")
+                ws.cell(r, c).value = s
+                print(f"row {r} col {c} updated: {text_old} -> {text_new}")
 
     wb.save(dst_file)
 
